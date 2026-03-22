@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nartiv – Talent Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #16161a;
+    --surface2: #1e1e24;
+    --border: #2a2a35;
+    --accent: #c8f04e;
+    --accent2: #7b61ff;
+    --text: #f0f0f0;
+    --muted: #7a7a90;
+    --danger: #ff5e5e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.5px;
+  }
+
+  .logo span { color: var(--accent); }
+
+  .nav-tag {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* LAYOUT */
+  .main {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 0;
+    height: calc(100vh - 65px);
+  }
+
+  /* LEFT PANEL */
+  .left-panel {
+    border-right: 1px solid var(--border);
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    overflow-y: auto;
+  }
+
+  .section-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  /* UPLOAD ZONE */
+  .upload-zone {
+    border: 1.5px dashed var(--border);
+    border-radius: 12px;
+    padding: 36px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--surface);
+    position: relative;
+  }
+
+  .upload-zone:hover, .upload-zone.drag-over {
+    border-color: var(--accent);
+    background: rgba(200, 240, 78, 0.04);
+  }
+
+  .upload-zone input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+
+  .upload-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: rgba(200,240,78,0.12);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 14px;
+    font-size: 20px;
+  }
+
+  .upload-zone h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .upload-zone p {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .upload-zone .formats {
+    margin-top: 12px;
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .format-tag {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(200,240,78,0.1);
+    border: 1px solid rgba(200,240,78,0.2);
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  /* PARSING PROGRESS */
+  .parse-status {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .parse-status.active { display: block; }
+
+  .parse-file {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .parse-file-icon { font-size: 18px; }
+
+  .parse-file-name {
+    font-size: 13px;
+    font-weight: 500;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .parse-bar-wrap {
+    height: 4px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .parse-bar {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  .parse-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  /* STATS */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+  }
+
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-desc {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* RIGHT PANEL */
+  .right-panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* TOOLBAR */
+  .toolbar {
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .search-wrap {
+    flex: 1;
+    position: relative;
+  }
+
+  .search-wrap input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px 10px 40px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-wrap input:focus { border-color: var(--accent2); }
+
+  .search-wrap input::placeholder { color: var(--muted); }
+
+  .search-icon {
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .filter-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .filter-chip:hover, .filter-chip.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(200,240,78,0.06);
+  }
+
+  /* TABLE */
+  .table-wrap {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 32px 32px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+  }
+
+  thead th {
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 16px 12px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 1;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  tbody tr:hover { background: var(--surface); }
+
+  tbody td {
+    padding: 16px 12px;
+    font-size: 14px;
+    vertical-align: middle;
+  }
+
+  .candidate-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    flex-shrink: 0;
+  }
+
+  .location-cell {
+    color: var(--muted);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .field-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+  }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  .status-new { background: var(--accent); }
+  .status-shortlisted { background: var(--accent2); }
+  .status-interviewing { background: #ff9f43; }
+
+  .status-label {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 80px 40px;
+    color: var(--muted);
+  }
+
+  .empty-state .empty-icon { font-size: 40px; margin-bottom: 16px; }
+
+  .empty-state h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .empty-state p { font-size: 14px; line-height: 1.6; }
+
+  /* MODAL / SIDE DRAWER */
+  .drawer-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+  }
+
+  .drawer-overlay.open { display: flex; justify-content: flex-end; }
+
+  .drawer {
+    width: 420px;
+    background: var(--surface);
+    height: 100%;
+    overflow-y: auto;
+    border-left: 1px solid var(--border);
+    padding: 32px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .drawer-overlay.open .drawer { transform: translateX(0); }
+
+  .drawer-close {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+
+  .drawer-close h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  .btn-close {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    transition: background 0.15s;
+  }
+
+  .btn-close:hover { background: var(--border); }
+
+  .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding: 20px;
+    background: var(--surface2);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .profile-avatar {
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    font-weight: 800;
+    font-family: 'Syne', sans-serif;
+  }
+
+  .profile-info h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .profile-info p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  .detail-section { margin-bottom: 24px; }
+
+  .detail-section .section-label { margin-bottom: 10px; }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .detail-row:last-child { border-bottom: none; }
+  .detail-key { color: var(--muted); }
+  .detail-val { font-weight: 500; text-align: right; max-width: 60%; }
+
+  .skills-wrap {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;
+  }
+
+  .skill-tag {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgba(123,97,255,0.15);
+    border: 1px solid rgba(123,97,255,0.25);
+    color: #a090ff;
+    font-weight: 500;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 28px; right: 28px;
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 200;
+    max-width: 340px;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-icon { font-size: 18px; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* Loading spinner */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    display: inline-block;
+  }
+
+  @keyframes fadeInRow {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .new-row { animation: fadeInRow 0.4s ease forwards; }
+
+  /* FOLDER BUTTON */
+  .folder-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 11px 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .folder-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(200,240,78,0.06);
+  }
+
+  .folder-btn input[type="file"] {
+    position: absolute; inset: 0;
+    opacity: 0; cursor: pointer;
+    width: 100%; height: 100%;
+  }
+
+  .folder-btn-icon { font-size: 16px; }
+
+  .folder-hint {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">NART<span>IV</span></div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="nav-tag">Talent Platform</div>
+    <div id="nav-count" style="font-size:13px;color:var(--muted);">0 candidates</div>
+  </div>
+</nav>
+
+<div class="main">
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div>
+      <div class="section-label">Upload CV</div>
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt" multiple>
+        <div class="upload-icon">📄</div>
+        <h3>Drop CVs here</h3>
+        <p>Upload one or multiple resumes to automatically extract candidate info</p>
+        <div class="formats">
+          <span class="format-tag">PDF</span>
+          <span class="format-tag">DOCX</span>
+          <span class="format-tag">TXT</span>
+        </div>
+      </div>
+
+      <button class="folder-btn">
+        <input type="file" id="folderInput" webkitdirectory multiple accept=".pdf,.doc,.docx,.txt">
+        <span class="folder-btn-icon">📁</span>
+        Select a Folder of CVs
+      </button>
+      <div class="folder-hint">Points to a folder on your computer — all CVs inside will be imported</div>
+    </div>
+
+    <div class="parse-status" id="parseStatus">
+      <div class="parse-file">
+        <span class="parse-file-icon">📄</span>
+        <span class="parse-file-name" id="parseFileName">resume.pdf</span>
+        <span class="spinner"></span>
+      </div>
+      <div class="parse-bar-wrap">
+        <div class="parse-bar" id="parseBar"></div>
+      </div>
+      <div class="parse-label" id="parseLabel">Extracting candidate data with AI…</div>
+    </div>
+
+    <div>
+      <div class="section-label">Overview</div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num" id="statTotal">0</div>
+          <div class="stat-desc">Total candidates</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statNew">0</div>
+          <div class="stat-desc">Added today</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Top Fields</div>
+      <div id="fieldBreakdown" style="display:flex;flex-direction:column;gap:8px;">
+        <div style="font-size:13px;color:var(--muted);">Upload CVs to see breakdown</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search by name, location, or field…">
+      </div>
+      <div class="filter-chip active" id="filterAll" onclick="setFilter('all')">All</div>
+      <div class="filter-chip" id="filterNew" onclick="setFilter('new')">New</div>
+      <div class="filter-chip" id="filterShortlisted" onclick="setFilter('shortlisted')">Shortlisted</div>
+    </div>
+
+    <div class="table-wrap">
+      <table id="candidateTable">
+        <thead>
+          <tr>
+            <th>Candidate</th>
+            <th>Location</th>
+            <th>Field of Work</th>
+            <th>Status</th>
+            <th>Added</th>
+          </tr>
+        </thead>
+        <tbody id="candidateBody">
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <div class="empty-icon">🗂️</div>
+                <h3>No candidates yet</h3>
+                <p>Upload CVs on the left to start building your talent database</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer(event)">
+  <div class="drawer" id="drawer">
+    <div class="drawer-close">
+      <h2>Candidate Profile</h2>
+      <button class="btn-close" onclick="closeDrawerDirect()">✕</button>
+    </div>
+    <div id="drawerContent"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon">✅</span>
+  <span id="toastMsg">Candidate added successfully</span>
+</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────
+let candidates = [];
+let currentFilter = 'all';
+let searchQuery = '';
+let todayCount = 0;
+
+// Avatar color palette
+const avatarColors = [
+  ['#c8f04e','#0d0d0f'],
+  ['#7b61ff','#fff'],
+  ['#ff9f43','#0d0d0f'],
+  ['#ff6b9d','#fff'],
+  ['#48dbfb','#0d0d0f'],
+  ['#1dd1a1','#0d0d0f'],
+];
+
+function getAvatarStyle(name) {
+  const idx = name.charCodeAt(0) % avatarColors.length;
+  const [bg, color] = avatarColors[idx];
+  return `background:${bg};color:${color}`;
+}
+
+function getInitials(name) {
+  return name.split(' ').map(p => p[0]).slice(0,2).join('').toUpperCase();
+}
+
+// Field badge colors
+const fieldColors = {
+  'Technology': ['rgba(123,97,255,0.15)','rgba(123,97,255,0.3)','#a090ff'],
+  'Finance': ['rgba(200,240,78,0.1)','rgba(200,240,78,0.25)','#c8f04e'],
+  'Marketing': ['rgba(255,107,157,0.1)','rgba(255,107,157,0.25)','#ff8ab5'],
+  'Healthcare': ['rgba(29,209,161,0.1)','rgba(29,209,161,0.25)','#1dd1a1'],
+  'Design': ['rgba(72,219,251,0.1)','rgba(72,219,251,0.25)','#48dbfb'],
+  'Operations': ['rgba(255,159,67,0.1)','rgba(255,159,67,0.25)','#ff9f43'],
+  'Sales': ['rgba(255,94,94,0.1)','rgba(255,94,94,0.25)','#ff7a7a'],
+  'Education': ['rgba(200,240,78,0.08)','rgba(200,240,78,0.2)','#b5d93d'],
+};
+
+function getFieldBadge(field) {
+  const colors = fieldColors[field] || ['rgba(255,255,255,0.05)','rgba(255,255,255,0.15)','#aaa'];
+  return `style="background:${colors[0]};border-color:${colors[1]};color:${colors[2]}"`;
+}
+
+// ─── UPLOAD ──────────────────────────────────────
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('drag-over');
+  handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+const folderInput = document.getElementById('folderInput');
+folderInput.addEventListener('change', e => {
+  const cvFiles = Array.from(e.target.files).filter(f =>
+    /\.(pdf|doc|docx|txt)$/i.test(f.name)
+  );
+  if (cvFiles.length === 0) {
+    showToast('⚠️ No supported CV files found in that folder');
+    return;
+  }
+  showToast(`📁 Found ${cvFiles.length} CV${cvFiles.length > 1 ? 's' : ''} — importing…`);
+  handleFiles(cvFiles);
+  folderInput.value = '';
+});
+
+async function handleFiles(files) {
+  for (const file of files) {
+    await processFile(file);
+  }
+  fileInput.value = '';
+}
+
+async function processFile(file) {
+  // Show parse status
+  document.getElementById('parseStatus').classList.add('active');
+  document.getElementById('parseFileName').textContent = file.name;
+  animateBar();
+
+  // Read file content
+  updateParseLabel('Reading file…');
+  const text = await readFileText(file);
+
+  if (!text || text.length < 30) {
+    document.getElementById('parseStatus').classList.remove('active');
+    document.getElementById('parseBar').style.width = '0%';
+    clearInterval(barInterval);
+    showToast('⚠️ Could not read text from this file. Try a text-based PDF.');
+    return;
+  }
+
+  // Call Claude API
+  updateParseLabel('Asking Claude to extract candidate info…');
+  const candidate = await extractWithClaude(text, file.name);
+
+  // Hide parse status
+  document.getElementById('parseStatus').classList.remove('active');
+  document.getElementById('parseBar').style.width = '0%';
+
+  if (candidate) {
+    candidate.id = Date.now();
+    candidate.status = 'new';
+    candidate.addedDate = new Date().toLocaleDateString('en-CA');
+    candidates.unshift(candidate);
+    todayCount++;
+    updateStats();
+    renderTable();
+    renderFieldBreakdown();
+    showToast(`✅ ${candidate.name} added to database`);
+  } else {
+    showToast('⚠️ Could not extract candidate info');
+  }
+}
+
+async function readFileText(file) {
+  if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+    return await extractPdfText(file);
+  }
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result || '');
+    reader.onerror = () => resolve('');
+    reader.readAsText(file);
+  });
+}
+
+// Load PDF.js from CDN and extract all text
+async function extractPdfText(file) {
+  try {
+    // Dynamically load PDF.js if not already loaded
+    if (!window.pdfjsLib) {
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let fullText = '';
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const pageText = content.items.map(item => item.str).join(' ');
+      fullText += pageText + '\n';
+    }
+
+    return fullText.trim() || '';
+  } catch (e) {
+    console.error('PDF.js extraction failed:', e);
+    return '';
+  }
+}
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+let barInterval;
+function animateBar() {
+  let pct = 0;
+  clearInterval(barInterval);
+  barInterval = setInterval(() => {
+    pct = Math.min(pct + Math.random() * 8, 88);
+    document.getElementById('parseBar').style.width = pct + '%';
+  }, 300);
+}
+
+function updateParseLabel(msg) {
+  document.getElementById('parseLabel').textContent = msg;
+}
+
+async function extractWithClaude(fileText, fileName) {
+  const prompt = `You are a resume parser. Extract the following fields from the CV text below.
+Return ONLY a JSON object (no markdown, no explanation) with these exact keys:
+{
+  "name": "Full name",
+  "location": "City, Country or just Country",
+  "field": "Main professional field (pick ONE from: Technology, Finance, Marketing, Healthcare, Design, Operations, Sales, Education, Other)",
+  "currentRole": "Current or most recent job title",
+  "email": "Email if found, else null",
+  "skills": ["skill1", "skill2", "skill3"],
+  "experience": "X years or 'Not specified'"
+}
+
+If information is missing, use null or "Not specified".
+
+CV TEXT:
+${fileText.slice(0, 6000)}
+
+Filename hint: ${fileName}`;
+
+  try {
+    const res = await fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    clearInterval(barInterval);
+    document.getElementById('parseBar').style.width = '100%';
+
+    const raw = data.content?.map(b => b.text || '').join('');
+    // Strip any markdown fences
+    const cleaned = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(cleaned);
+    return parsed;
+  } catch (e) {
+    clearInterval(barInterval);
+    console.error('Claude extraction error:', e);
+    return null;
+  }
+}
+
+// ─── RENDER TABLE ────────────────────────────────
+function renderTable() {
+  const body = document.getElementById('candidateBody');
+  let filtered = candidates.filter(c => {
+    const q = searchQuery.toLowerCase();
+    const matchSearch = !q ||
+      c.name?.toLowerCase().includes(q) ||
+      c.location?.toLowerCase().includes(q) ||
+      c.field?.toLowerCase().includes(q) ||
+      c.currentRole?.toLowerCase().includes(q);
+    const matchFilter = currentFilter === 'all' || c.status === currentFilter;
+    return matchSearch && matchFilter;
+  });
+
+  if (filtered.length === 0) {
+    if (candidates.length === 0) {
+      body.innerHTML = `<tr><td colspan="5"><div class="empty-state">
+        <div class="empty-icon">🗂️</div>
+        <h3>No candidates yet</h3>
+        <p>Upload CVs on the left to start building your talent database</p>
+      </div></td></tr>`;
+    } else {
+      body.innerHTML = `<tr><td colspan="5"><div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h3>No results</h3>
+        <p>Try adjusting your search or filter</p>
+      </div></td></tr>`;
+    }
+    return;
+  }
+
+  body.innerHTML = filtered.map((c, i) => `
+    <tr class="new-row" style="animation-delay:${i * 0.04}s" onclick="openDrawer(${c.id})">
+      <td>
+        <div class="candidate-name">
+          <div class="avatar" style="${getAvatarStyle(c.name || 'U')}">${getInitials(c.name || 'UN')}</div>
+          <div>
+            <div>${c.name || 'Unknown'}</div>
+            <div style="font-size:11px;color:var(--muted);font-family:'DM Sans';font-weight:400;margin-top:2px">${c.currentRole || 'Role not specified'}</div>
+          </div>
+        </div>
+      </td>
+      <td class="location-cell">
+        <span>📍</span>${c.location || 'Not specified'}
+      </td>
+      <td>
+        <span class="field-badge" ${getFieldBadge(c.field)}>${c.field || 'Other'}</span>
+      </td>
+      <td>
+        <span class="status-dot status-${c.status}"></span>
+        <span class="status-label">${c.status.charAt(0).toUpperCase() + c.status.slice(1)}</span>
+      </td>
+      <td style="color:var(--muted);font-size:12px">${c.addedDate}</td>
+    </tr>
+  `).join('');
+}
+
+// ─── SEARCH & FILTER ─────────────────────────────
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value;
+  renderTable();
+});
+
+function setFilter(f) {
+  currentFilter = f;
+  ['all','new','shortlisted','interviewing'].forEach(x => {
+    document.getElementById('filter' + x.charAt(0).toUpperCase() + x.slice(1))?.classList.remove('active');
+  });
+  document.getElementById('filter' + f.charAt(0).toUpperCase() + f.slice(1))?.classList.add('active');
+  renderTable();
+}
+
+// ─── STATS ───────────────────────────────────────
+function updateStats() {
+  document.getElementById('statTotal').textContent = candidates.length;
+  document.getElementById('statNew').textContent = todayCount;
+  document.getElementById('nav-count').textContent = `${candidates.length} candidate${candidates.length !== 1 ? 's' : ''}`;
+}
+
+function renderFieldBreakdown() {
+  const counts = {};
+  candidates.forEach(c => { counts[c.field] = (counts[c.field] || 0) + 1; });
+  const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,4);
+  const max = sorted[0]?.[1] || 1;
+  const el = document.getElementById('fieldBreakdown');
+  if (sorted.length === 0) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--muted);">Upload CVs to see breakdown</div>';
+    return;
+  }
+  el.innerHTML = sorted.map(([field, count]) => {
+    const colors = fieldColors[field] || ['rgba(255,255,255,0.05)','rgba(255,255,255,0.1)','#aaa'];
+    const pct = Math.round((count / max) * 100);
+    return `<div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:12px;font-weight:500">${field}</span>
+        <span style="font-size:12px;color:var(--muted)">${count}</span>
+      </div>
+      <div style="height:4px;background:var(--border);border-radius:4px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${colors[2]};border-radius:4px;transition:width 0.5s ease"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── DRAWER ──────────────────────────────────────
+function openDrawer(id) {
+  const c = candidates.find(x => x.id === id);
+  if (!c) return;
+
+  const content = document.getElementById('drawerContent');
+  content.innerHTML = `
+    <div class="profile-header">
+      <div class="profile-avatar" style="${getAvatarStyle(c.name || 'U')}">${getInitials(c.name || 'UN')}</div>
+      <div class="profile-info">
+        <h3>${c.name || 'Unknown Candidate'}</h3>
+        <p>${c.currentRole || 'Role not specified'}</p>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="section-label">Basic Info</div>
+      <div class="detail-row">
+        <span class="detail-key">Location</span>
+        <span class="detail-val">📍 ${c.location || 'Not specified'}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-key">Field</span>
+        <span class="detail-val"><span class="field-badge" ${getFieldBadge(c.field)}>${c.field || 'Other'}</span></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-key">Experience</span>
+        <span class="detail-val">${c.experience || 'Not specified'}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-key">Email</span>
+        <span class="detail-val" style="font-size:12px">${c.email || 'Not found'}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-key">Status</span>
+        <span class="detail-val">
+          <span class="status-dot status-${c.status}"></span>
+          ${c.status.charAt(0).toUpperCase() + c.status.slice(1)}
+        </span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-key">Added</span>
+        <span class="detail-val">${c.addedDate}</span>
+      </div>
+    </div>
+
+    ${c.skills?.length ? `
+    <div class="detail-section">
+      <div class="section-label">Skills</div>
+      <div class="skills-wrap">
+        ${c.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <div class="detail-section">
+      <div class="section-label">Update Status</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${['new','shortlisted','interviewing'].map(s => `
+          <div class="filter-chip ${c.status === s ? 'active' : ''}" onclick="updateStatus(${c.id},'${s}')">
+            ${s.charAt(0).toUpperCase() + s.slice(1)}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('drawerOverlay').classList.add('open');
+}
+
+function updateStatus(id, status) {
+  const c = candidates.find(x => x.id === id);
+  if (c) { c.status = status; renderTable(); openDrawer(id); }
+}
+
+function closeDrawer(e) {
+  if (e.target === document.getElementById('drawerOverlay')) closeDrawerDirect();
+}
+
+function closeDrawerDirect() {
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
+
+// ─── TOAST ───────────────────────────────────────
+let toastTimeout;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => toast.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>
