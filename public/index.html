@@ -563,6 +563,112 @@
 
   .new-row { animation: fadeInRow 0.4s ease forwards; }
 
+  /* INLINE EDITOR */
+  .editable-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    border-radius: 6px;
+    padding: 2px 4px;
+    transition: background 0.15s;
+    position: relative;
+  }
+
+  .editable-cell:hover { background: rgba(255,255,255,0.06); }
+
+  .edit-hint {
+    font-size: 10px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .editable-cell:hover .edit-hint { opacity: 1; }
+
+  .editor-popup {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    z-index: 50;
+    min-width: 220px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    animation: fadeInRow 0.15s ease;
+  }
+
+  .editor-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .editor-options {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .editor-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+
+  .editor-option:hover { background: rgba(255,255,255,0.07); }
+  .editor-option.selected { background: rgba(200,240,78,0.08); }
+
+  .editor-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 10px 0 6px;
+  }
+
+  .editor-custom {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .editor-custom input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    outline: none;
+  }
+
+  .editor-custom input:focus { border-color: var(--accent); }
+
+  .editor-custom button {
+    background: var(--accent);
+    color: #0d0d0f;
+    border: none;
+    border-radius: 7px;
+    padding: 7px 12px;
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .editor-custom button:hover { opacity: 0.85; }
+
   /* FOLDER BUTTON */
   .folder-btn {
     width: 100%;
@@ -1007,17 +1113,108 @@ function renderTable() {
       <td class="location-cell">
         <span>📍</span>${c.location || 'Not specified'}
       </td>
-      <td>
-        <span class="field-badge" ${getFieldBadge(c.field)}>${c.field || 'Other'}</span>
+      <td onclick="event.stopPropagation()">
+        <div class="editable-cell" onclick="openFieldEditor(${c.id}, this)">
+          <span class="field-badge" ${getFieldBadge(c.field)}>${c.field || 'Other'}</span>
+          <span class="edit-hint">✏️</span>
+        </div>
       </td>
-      <td>
-        <span class="status-dot status-${c.status}"></span>
-        <span class="status-label">${c.status.charAt(0).toUpperCase() + c.status.slice(1)}</span>
+      <td onclick="event.stopPropagation()">
+        <div class="editable-cell" onclick="openStatusEditor(${c.id}, this)">
+          <span class="status-dot status-${c.status}"></span>
+          <span class="status-label">${c.status.charAt(0).toUpperCase() + c.status.slice(1)}</span>
+          <span class="edit-hint">✏️</span>
+        </div>
       </td>
       <td style="color:var(--muted);font-size:12px">${c.addedDate}</td>
     </tr>
   `).join('');
 }
+
+// ─── INLINE EDITORS ──────────────────────────────
+const FIELDS = ['Technology','Finance','Marketing','Healthcare','Design','Operations','Sales','Education','Other'];
+const STATUSES = ['new','shortlisted','interviewing','placed'];
+
+function openFieldEditor(id, el) {
+  closeAllEditors();
+  const c = candidates.find(x => x.id === id);
+  if (!c) return;
+
+  const popup = document.createElement('div');
+  popup.className = 'editor-popup';
+  popup.id = 'activeEditor';
+  popup.innerHTML = `
+    <div class="editor-title">Edit Field</div>
+    <div class="editor-options">
+      ${FIELDS.map(f => `
+        <div class="editor-option ${c.field === f ? 'selected' : ''}" onclick="saveField(${id},'${f}')">
+          <span class="field-badge" ${getFieldBadge(f)}>${f}</span>
+        </div>
+      `).join('')}
+    </div>
+    <div class="editor-divider"></div>
+    <div class="editor-title" style="margin-top:8px">Custom field</div>
+    <div class="editor-custom">
+      <input type="text" id="customFieldInput" placeholder="e.g. Real Estate, Logistics…" value="${!FIELDS.includes(c.field) ? c.field || '' : ''}">
+      <button onclick="saveCustomField(${id})">Save</button>
+    </div>
+  `;
+
+  el.style.position = 'relative';
+  el.appendChild(popup);
+  setTimeout(() => document.getElementById('customFieldInput')?.focus(), 50);
+}
+
+function saveField(id, field) {
+  const c = candidates.find(x => x.id === id);
+  if (c) { c.field = field; closeAllEditors(); renderTable(); renderFieldBreakdown(); showToast(`✅ Field updated to ${field}`); }
+}
+
+function saveCustomField(id) {
+  const val = document.getElementById('customFieldInput')?.value.trim();
+  if (!val) return;
+  const c = candidates.find(x => x.id === id);
+  if (c) { c.field = val; closeAllEditors(); renderTable(); renderFieldBreakdown(); showToast(`✅ Field updated to ${val}`); }
+}
+
+function openStatusEditor(id, el) {
+  closeAllEditors();
+  const c = candidates.find(x => x.id === id);
+  if (!c) return;
+
+  const popup = document.createElement('div');
+  popup.className = 'editor-popup';
+  popup.id = 'activeEditor';
+  popup.innerHTML = `
+    <div class="editor-title">Update Status</div>
+    <div class="editor-options">
+      ${STATUSES.map(s => `
+        <div class="editor-option ${c.status === s ? 'selected' : ''}" onclick="saveStatus(${id},'${s}')">
+          <span class="status-dot status-${s}"></span>
+          <span style="font-size:13px">${s.charAt(0).toUpperCase() + s.slice(1)}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  el.style.position = 'relative';
+  el.appendChild(popup);
+}
+
+function saveStatus(id, status) {
+  const c = candidates.find(x => x.id === id);
+  if (c) { c.status = status; closeAllEditors(); renderTable(); showToast(`✅ Status updated to ${status}`); }
+}
+
+function closeAllEditors() {
+  document.getElementById('activeEditor')?.remove();
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.editor-popup') && !e.target.closest('.editable-cell')) {
+    closeAllEditors();
+  }
+});
 
 // ─── SEARCH & FILTER ─────────────────────────────
 document.getElementById('searchInput').addEventListener('input', e => {
