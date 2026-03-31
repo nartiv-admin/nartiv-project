@@ -711,11 +711,130 @@
     color: var(--muted);
     margin-top: 8px;
   }
+
+  /* LOGIN SCREEN */
+  .login-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    flex-direction: column;
+  }
+
+  .login-screen.hidden { display: none; }
+
+  .login-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .login-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    letter-spacing: -0.5px;
+  }
+
+  .login-logo span { color: var(--accent); }
+
+  .login-tagline {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: -16px;
+  }
+
+  .login-fields {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .login-fields input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .login-fields input:focus { border-color: var(--accent); }
+  .login-fields input::placeholder { color: var(--muted); }
+
+  .login-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #0d0d0f;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .login-btn:hover { opacity: 0.88; }
+
+  .login-error {
+    font-size: 12px;
+    color: var(--danger);
+    text-align: center;
+    min-height: 16px;
+    margin-top: -10px;
+  }
+
+  .login-lock {
+    font-size: 36px;
+    margin-bottom: -8px;
+  }
 </style>
 </head>
 <body>
 
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-lock">🔐</div>
+    <div class="login-logo">NART<span>IV</span></div>
+    <div class="login-tagline">Talent Matching Platform — Team Access</div>
+    <div class="login-fields">
+      <input type="text" id="loginUser" placeholder="Username" autocomplete="username">
+      <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter') attemptLogin()">
+    </div>
+    <div class="login-error" id="loginError"></div>
+    <button class="login-btn" onclick="attemptLogin()">Enter Platform →</button>
+  </div>
+</div>
+
 <nav>
+  <div class="logo">NART<span>IV</span></div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="nav-tag">Talent Platform</div>
+    <div id="nav-count" style="font-size:13px;color:var(--muted);">0 candidates</div>
+    <div class="filter-chip" onclick="logout()" style="font-size:11px;padding:5px 10px;">Sign out</div>
+  </div>
+</nav>
   <div class="logo">NART<span>IV</span></div>
   <div style="display:flex;align-items:center;gap:12px;">
     <div class="nav-tag">Talent Platform</div>
@@ -839,6 +958,49 @@
 </div>
 
 <script>
+// ─── AUTH ─────────────────────────────────────────
+// Add your team's credentials here
+const USERS = {
+  'mai':   'nartiv2024',
+  'erika': 'nartiv2024',
+  'admin': 'nartiv2024',
+};
+
+function checkAuth() {
+  const loggedIn = sessionStorage.getItem('nartiv_auth');
+  if (loggedIn === 'true') {
+    document.getElementById('loginScreen').classList.add('hidden');
+  }
+}
+
+function attemptLogin() {
+  const user = document.getElementById('loginUser').value.trim().toLowerCase();
+  const pass = document.getElementById('loginPass').value;
+  const error = document.getElementById('loginError');
+
+  if (USERS[user] && USERS[user] === pass) {
+    sessionStorage.setItem('nartiv_auth', 'true');
+    sessionStorage.setItem('nartiv_user', user);
+    document.getElementById('loginScreen').classList.add('hidden');
+    error.textContent = '';
+  } else {
+    error.textContent = 'Incorrect username or password.';
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginPass').focus();
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem('nartiv_auth');
+  sessionStorage.removeItem('nartiv_user');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+// Run auth check on load
+checkAuth();
+
 // ─── STATE ───────────────────────────────────────
 let candidates = [];
 let currentFilter = 'all';
