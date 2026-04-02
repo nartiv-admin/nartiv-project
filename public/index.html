@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nartiv – Talent Platform</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -816,9 +817,9 @@
   <div class="login-box">
     <div class="login-lock">🔐</div>
     <div class="login-logo">NART<span>IV</span></div>
-    <div class="login-tagline">Talent Matching Platform — Team Access</div>
+    <div class="login-tagline">Talent Matching Platform — Secure Access</div>
     <div class="login-fields">
-      <input type="text" id="loginUser" placeholder="Username" autocomplete="username">
+      <input type="email" id="loginUser" placeholder="Email address (e.g. mai@yournartiv.com)" autocomplete="email">
       <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password"
         onkeydown="if(event.key==='Enter') attemptLogin()">
     </div>
@@ -831,14 +832,18 @@
   <div class="logo">NART<span>IV</span></div>
   <div style="display:flex;align-items:center;gap:12px;">
     <div class="nav-tag">Talent Platform</div>
+    <div id="navUser" style="font-size:12px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);padding:5px 12px;border-radius:20px;">—</div>
     <div id="nav-count" style="font-size:13px;color:var(--muted);">0 candidates</div>
+    <button onclick="logout()" style="font-size:11px;color:var(--muted);background:none;border:1px solid var(--border);padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;" onmouseover="this.style.color='#ff5e5e';this.style.borderColor='#ff5e5e'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">Sign out</button>
     <div class="filter-chip" onclick="logout()" style="font-size:11px;padding:5px 10px;">Sign out</div>
   </div>
 </nav>
   <div class="logo">NART<span>IV</span></div>
   <div style="display:flex;align-items:center;gap:12px;">
     <div class="nav-tag">Talent Platform</div>
+    <div id="navUser" style="font-size:12px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);padding:5px 12px;border-radius:20px;">—</div>
     <div id="nav-count" style="font-size:13px;color:var(--muted);">0 candidates</div>
+    <button onclick="logout()" style="font-size:11px;color:var(--muted);background:none;border:1px solid var(--border);padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;" onmouseover="this.style.color='#ff5e5e';this.style.borderColor='#ff5e5e'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">Sign out</button>
   </div>
 </nav>
 
@@ -960,42 +965,99 @@
 <script>
 // ─── AUTH ─────────────────────────────────────────
 // Add your team's credentials here
-const USERS = {
-  'mai':   'nartiv2024',
-  'erika': 'nartiv2024',
-  'admin': 'nartiv2024',
-};
+// ── SUPABASE ──────────────────────────────────────────────
+const sb = supabase.createClient(
+  'https://qppbykswuuimddkbizmp.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwcGJ5a3N3dXVpbWRka2Jpem1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwNjk3ODcsImV4cCI6MjA5MDY0NTc4N30.4Srty0TgT5vAM1tHrt16IMyZbO2JuhLCcoP_ZrmzzJI'
+);
 
-function checkAuth() {
-  const loggedIn = sessionStorage.getItem('nartiv_auth');
-  if (loggedIn === 'true') {
-    document.getElementById('loginScreen').classList.add('hidden');
-  }
+let currentUser = null;
+
+async function initAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) { currentUser = session.user; showApp(); }
+  sb.auth.onAuthStateChange((_e, session) => {
+    if (session) { currentUser = session.user; showApp(); }
+    else { currentUser = null; showLogin(); }
+  });
 }
 
-function attemptLogin() {
-  const user = document.getElementById('loginUser').value.trim().toLowerCase();
-  const pass = document.getElementById('loginPass').value;
-  const error = document.getElementById('loginError');
-
-  if (USERS[user] && USERS[user] === pass) {
-    sessionStorage.setItem('nartiv_auth', 'true');
-    sessionStorage.setItem('nartiv_user', user);
-    document.getElementById('loginScreen').classList.add('hidden');
-    error.textContent = '';
-  } else {
-    error.textContent = 'Incorrect username or password.';
-    document.getElementById('loginPass').value = '';
-    document.getElementById('loginPass').focus();
-  }
-}
-
-function logout() {
-  sessionStorage.removeItem('nartiv_auth');
-  sessionStorage.removeItem('nartiv_user');
+function showLogin() {
   document.getElementById('loginScreen').classList.remove('hidden');
-  document.getElementById('loginUser').value = '';
-  document.getElementById('loginPass').value = '';
+  candidates = []; renderTable();
+}
+
+function showApp() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  const name = currentUser.email.split('@')[0];
+  document.getElementById('navUser').textContent = '👤 ' + name;
+  loadCandidates();
+}
+
+async function checkAuth() { await initAuth(); }
+
+async function attemptLogin() {
+  const email = document.getElementById('loginUser').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  const error = document.getElementById('loginError');
+  const btn   = document.querySelector('.login-btn');
+  if (!email || !pass) { error.textContent = 'Please enter your email and password.'; return; }
+  btn.disabled = true; btn.textContent = 'Signing in…'; error.textContent = '';
+  const { error: err } = await sb.auth.signInWithPassword({ email, password: pass });
+  btn.disabled = false; btn.textContent = 'Enter Platform →';
+  if (err) { error.textContent = 'Incorrect email or password.'; document.getElementById('loginPass').value = ''; }
+}
+
+async function logout() {
+  await sb.auth.signOut();
+}
+
+// ── DATABASE ──────────────────────────────────────────────
+async function loadCandidates() {
+  const { data, error } = await sb.from('candidates').select('*').order('created_at', { ascending: false });
+  if (error) { showToast('⚠️ Error loading candidates'); return; }
+  candidates = (data || []).map(c => ({
+    id: c.id, name: c.name, email: c.email, location: c.location,
+    field: c.field, currentRole: c.current_role, experience: c.experience,
+    skills: c.skills || [], status: c.status || 'new',
+    cvUrl: c.cv_url, cvFilename: c.cv_filename,
+    addedDate: (c.created_at || '').slice(0, 10),
+    addedBy: c.added_by,
+  }));
+  updateStats(); renderTable(); renderFieldBreakdown();
+}
+
+async function saveCandidateToDB(candidate) {
+  const { data, error } = await sb.from('candidates').insert([{
+    name: candidate.name, email: candidate.email, location: candidate.location,
+    field: candidate.field, current_role: candidate.currentRole,
+    experience: candidate.experience, skills: candidate.skills,
+    status: 'new', cv_url: candidate.cvUrl || null,
+    cv_filename: candidate.cvFilename || null,
+    added_by: currentUser?.email || 'unknown',
+  }]).select().single();
+  if (error) { console.error(error); showToast('⚠️ Error saving to database'); return null; }
+  return { id: data.id, ...candidate, addedDate: data.created_at.slice(0,10), addedBy: data.added_by };
+}
+
+async function updateCandidateInDB(id, updates) {
+  const dbUpdates = {};
+  if (updates.field !== undefined) dbUpdates.field = updates.field;
+  if (updates.status !== undefined) dbUpdates.status = updates.status;
+  const { error } = await sb.from('candidates').update(dbUpdates).eq('id', id);
+  if (error) console.error('Update error:', error);
+}
+
+async function uploadCVToStorage(file, candidateName) {
+  const ext = file.name.split('.').pop();
+  const safe = (candidateName || 'candidate').replace(/[^a-z0-9]/gi,'_').toLowerCase();
+  const path = `cvs/${Date.now()}_${safe}.${ext}`;
+  const { error } = await sb.storage.from('candidate-files').upload(path, file, {
+    contentType: file.type || 'application/octet-stream', upsert: false
+  });
+  if (error) { console.error('Storage error:', error); return null; }
+  const { data } = sb.storage.from('candidate-files').getPublicUrl(path);
+  return { url: data.publicUrl, filename: file.name };
 }
 
 // Run auth check on load
@@ -1105,15 +1167,22 @@ async function processFile(file) {
   document.getElementById('parseBar').style.width = '0%';
 
   if (candidate) {
-    candidate.id = Date.now();
-    candidate.status = 'new';
-    candidate.addedDate = new Date().toLocaleDateString('en-CA');
-    candidates.unshift(candidate);
-    todayCount++;
-    updateStats();
-    renderTable();
-    renderFieldBreakdown();
-    showToast(`✅ ${candidate.name} added to database`);
+    // Upload CV to Supabase Storage
+    updateParseLabel('Uploading CV securely to encrypted storage…');
+    let cvData = null;
+    try { cvData = await uploadCVToStorage(file, candidate.name); } catch(e) { console.error(e); }
+    candidate.cvUrl = cvData?.url || null;
+    candidate.cvFilename = cvData?.filename || file.name;
+
+    // Save to Supabase database
+    const saved = await saveCandidateToDB(candidate);
+    if (saved) {
+      candidates.unshift(saved);
+      updateStats();
+      renderTable();
+      renderFieldBreakdown();
+      showToast(`✅ ${candidate.name} saved securely`);
+    }
   } else {
     showToast('⚠️ Could not extract candidate info');
   }
@@ -1327,16 +1396,24 @@ function openFieldEditor(id, el) {
   setTimeout(() => document.getElementById('customFieldInput')?.focus(), 50);
 }
 
-function saveField(id, field) {
+async function saveField(id, field) {
   const c = candidates.find(x => x.id === id);
-  if (c) { c.field = field; closeAllEditors(); renderTable(); renderFieldBreakdown(); showToast(`✅ Field updated to ${field}`); }
+  if (c) {
+    c.field = field;
+    await updateCandidateInDB(id, { field });
+    closeAllEditors(); renderTable(); renderFieldBreakdown(); showToast(`✅ Field updated to ${field}`);
+  }
 }
 
-function saveCustomField(id) {
+async function saveCustomField(id) {
   const val = document.getElementById('customFieldInput')?.value.trim();
   if (!val) return;
   const c = candidates.find(x => x.id === id);
-  if (c) { c.field = val; closeAllEditors(); renderTable(); renderFieldBreakdown(); showToast(`✅ Field updated to ${val}`); }
+  if (c) {
+    c.field = val;
+    await updateCandidateInDB(id, { field: val });
+    closeAllEditors(); renderTable(); renderFieldBreakdown(); showToast(`✅ Field updated to ${val}`);
+  }
 }
 
 function openStatusEditor(id, el) {
@@ -1479,10 +1556,17 @@ function openDrawer(id) {
       </div>
     </div>` : ''}
 
+    ${c.cvUrl ? `
+    <div class="detail-section">
+      <div class="section-label">CV File</div>
+      <a href="${c.cvUrl}" target="_blank" style="display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;text-decoration:none;color:var(--text);font-size:13px;font-weight:500;margin-top:4px">
+        📄 ${c.cvFilename || 'View CV'} <span style="margin-left:auto;color:var(--accent);font-size:11px">Download ↗</span>
+      </a>
+    </div>` : ''}
     <div class="detail-section">
       <div class="section-label">Update Status</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        ${['new','shortlisted','interviewing'].map(s => `
+        ${['new','shortlisted','interviewing','placed'].map(s => `
           <div class="filter-chip ${c.status === s ? 'active' : ''}" onclick="updateStatus(${c.id},'${s}')">
             ${s.charAt(0).toUpperCase() + s.slice(1)}
           </div>
@@ -1494,9 +1578,13 @@ function openDrawer(id) {
   document.getElementById('drawerOverlay').classList.add('open');
 }
 
-function updateStatus(id, status) {
+async function updateStatus(id, status) {
   const c = candidates.find(x => x.id === id);
-  if (c) { c.status = status; renderTable(); openDrawer(id); }
+  if (c) {
+    c.status = status;
+    await updateCandidateInDB(id, { status });
+    renderTable(); openDrawer(id);
+  }
 }
 
 function closeDrawer(e) {
