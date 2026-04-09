@@ -1009,9 +1009,8 @@ async function loadCandidates() {
   if (error) { showToast('⚠️ Error loading candidates'); return; }
   candidates = (data || []).map(c => ({
     id: c.id, name: c.name, email: c.email, location: c.location,
-    field: c.field, currentRole: c.current_role, experience: c.experience,
+    field: c.field, currentRole: c.current_position, experience: c.experience,
     skills: c.skills || [], status: c.status || 'new',
-    cvUrl: c.cv_url, cvFilename: c.cv_filename,
     addedDate: (c.created_at || '').slice(0, 10),
     addedBy: c.added_by,
   }));
@@ -1021,11 +1020,10 @@ async function loadCandidates() {
 async function saveCandidateToDB(candidate) {
   const { data, error } = await sb.from('candidates').insert([{
     name: candidate.name, email: candidate.email, location: candidate.location,
-    field: candidate.field, current_role: candidate.currentRole,
-    experience: candidate.experience, skills: candidate.skills,
-    status: 'new', cv_url: candidate.cvUrl || null,
-    cv_filename: candidate.cvFilename || null,
-    added_by: currentUser?.email || 'unknown',
+    field: candidate.field, current_position: candidate.currentRole,
+    experience: candidate.experience, skills: candidate.skills || [],
+    status: 'new',
+    added_by: currentUser?.id || null,
   }]).select().single();
   if (error) { console.error(error); showToast('⚠️ Error saving to database'); return null; }
   return { id: data.id, ...candidate, addedDate: data.created_at.slice(0,10), addedBy: data.added_by };
