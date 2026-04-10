@@ -12,7 +12,8 @@
     --surface: #16161a;
     --surface2: #1e1e24;
     --border: #2a2a35;
-    --accent: #c8f04e;
+    --accent: #7B2FBE;
+    --accent-rgb: 123,47,190;
     --accent2: #7b61ff;
     --text: #f0f0f0;
     --muted: #7a7a90;
@@ -53,7 +54,7 @@
     border: 1px solid transparent;
   }
   .nav-tab:hover { color: var(--text); background: var(--surface2); }
-  .nav-tab.active { color: var(--accent); background: rgba(200,240,78,0.1); border-color: rgba(200,240,78,0.25); }
+  .nav-tab.active { color: var(--accent); background: rgba(var(--accent-rgb),0.1); border-color: rgba(var(--accent-rgb),0.25); }
   .companies-wrap { display: none; flex-direction: column; height: 100%; }
   .companies-wrap.active { display: flex; }
   .company-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; padding: 24px 32px; overflow-y: auto; flex: 1; }
@@ -63,7 +64,7 @@
   .company-industry { font-size: 12px; color: var(--muted); margin-top: 3px; }
   .contract-badge { font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; }
   .badge-active { background: rgba(29,209,161,0.15); color: #1dd1a1; border: 1px solid rgba(29,209,161,0.3); }
-  .badge-prospect { background: rgba(200,240,78,0.1); color: var(--accent); border: 1px solid rgba(200,240,78,0.25); }
+  .badge-prospect { background: rgba(var(--accent-rgb),0.1); color: var(--accent); border: 1px solid rgba(var(--accent-rgb),0.25); }
   .badge-closed { background: rgba(255,94,94,0.1); color: #ff5e5e; border: 1px solid rgba(255,94,94,0.2); }
   .company-roles { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
   .role-tag { font-size: 11px; padding: 3px 10px; border-radius: 6px; background: rgba(123,97,255,0.12); border: 1px solid rgba(123,97,255,0.2); color: #a090ff; }
@@ -151,7 +152,7 @@
   .upload-icon {
     width: 44px; height: 44px;
     border-radius: 10px;
-    background: rgba(200,240,78,0.12);
+    background: rgba(var(--accent-rgb),0.12);
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 14px;
     font-size: 20px;
@@ -184,8 +185,8 @@
     letter-spacing: 1px;
     text-transform: uppercase;
     color: var(--accent);
-    background: rgba(200,240,78,0.1);
-    border: 1px solid rgba(200,240,78,0.2);
+    background: rgba(var(--accent-rgb),0.1);
+    border: 1px solid rgba(var(--accent-rgb),0.2);
     padding: 3px 8px;
     border-radius: 4px;
   }
@@ -330,7 +331,7 @@
   .filter-chip:hover, .filter-chip.active {
     border-color: var(--accent);
     color: var(--accent);
-    background: rgba(200,240,78,0.06);
+    background: rgba(var(--accent-rgb),0.06);
   }
 
   /* TABLE */
@@ -669,7 +670,7 @@
   }
 
   .editor-option:hover { background: rgba(255,255,255,0.07); }
-  .editor-option.selected { background: rgba(200,240,78,0.08); }
+  .editor-option.selected { background: rgba(var(--accent-rgb),0.08); }
 
   .editor-divider {
     height: 1px;
@@ -737,7 +738,7 @@
   .folder-btn:hover {
     border-color: var(--accent);
     color: var(--accent);
-    background: rgba(200,240,78,0.06);
+    background: rgba(var(--accent-rgb),0.06);
   }
 
   .folder-btn input[type="file"] {
@@ -1100,6 +1101,7 @@ function showApp() {
   document.getElementById('loginScreen').classList.add('hidden');
   const name = currentUser.email.split('@')[0];
   document.getElementById('navUser').textContent = '👤 ' + name;
+  setAccent(ACCENT_CANDIDATES); // start on candidates with violet
   loadCandidates();
 }
 
@@ -1199,13 +1201,13 @@ function getInitials(name) {
 // Field badge colors
 const fieldColors = {
   'Technology': ['rgba(123,97,255,0.15)','rgba(123,97,255,0.3)','#a090ff'],
-  'Finance': ['rgba(200,240,78,0.1)','rgba(200,240,78,0.25)','#c8f04e'],
+  'Finance': ['rgba(var(--accent-rgb),0.1)','rgba(var(--accent-rgb),0.25)','#c8f04e'],
   'Marketing': ['rgba(255,107,157,0.1)','rgba(255,107,157,0.25)','#ff8ab5'],
   'Healthcare': ['rgba(29,209,161,0.1)','rgba(29,209,161,0.25)','#1dd1a1'],
   'Design': ['rgba(72,219,251,0.1)','rgba(72,219,251,0.25)','#48dbfb'],
   'Operations': ['rgba(255,159,67,0.1)','rgba(255,159,67,0.25)','#ff9f43'],
   'Sales': ['rgba(255,94,94,0.1)','rgba(255,94,94,0.25)','#ff7a7a'],
-  'Education': ['rgba(200,240,78,0.08)','rgba(200,240,78,0.2)','#b5d93d'],
+  'Education': ['rgba(var(--accent-rgb),0.08)','rgba(var(--accent-rgb),0.2)','#b5d93d'],
 };
 
 function getFieldBadge(field) {
@@ -1715,6 +1717,22 @@ function showToast(msg) {
 // ─── TAB SWITCHING ───────────────────────────────
 let companies = [];
 
+// Accent colors per section
+const ACCENT_CANDIDATES = { color: '#7B2FBE', rgb: '123,47,190', name: 'violet' };   // Violet
+const ACCENT_COMPANIES  = { color: '#2BBCF0', rgb: '43,188,240', name: 'cerulean' }; // Cerulean
+
+function setAccent(a) {
+  const root = document.documentElement;
+  root.style.setProperty('--accent', a.color);
+  root.style.setProperty('--accent-rgb', a.rgb);
+  // Update all hardcoded rgba references dynamically
+  document.querySelectorAll('.nav-tab.active').forEach(el => {
+    el.style.color = a.color;
+    el.style.background = `rgba(${a.rgb},0.1)`;
+    el.style.borderColor = `rgba(${a.rgb},0.25)`;
+  });
+}
+
 function switchTab(tab) {
   const mainEl = document.querySelector('.main');
   const companiesWrap = document.getElementById('companiesWrap');
@@ -1726,11 +1744,13 @@ function switchTab(tab) {
     companiesWrap.classList.remove('active');
     tabCandidates.classList.add('active');
     tabCompanies.classList.remove('active');
+    setAccent(ACCENT_CANDIDATES);
   } else {
     mainEl.style.display = 'none';
     companiesWrap.classList.add('active');
     tabCandidates.classList.remove('active');
     tabCompanies.classList.add('active');
+    setAccent(ACCENT_COMPANIES);
     loadCompanies();
   }
 }
