@@ -4,7 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nartiv – Talent Platform</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+// ── THEME TOGGLE ──────────────────────────────────────────────
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  const btn = document.getElementById('themeToggle');
+  btn.textContent = isLight ? '🌙 Dark' : '☀️ Light';
+  localStorage.setItem('nartiv-theme', isLight ? 'light' : 'dark');
+}
+
+function applyStoredTheme() {
+  const stored = localStorage.getItem('nartiv-theme');
+  if (stored === 'light') {
+    document.body.classList.add('light-mode');
+    const btn = document.getElementById('themeToggle');
+    if (btn) btn.textContent = '🌙 Dark';
+  }
+}
+
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -853,6 +871,39 @@
     font-size: 36px;
     margin-bottom: -8px;
   }
+
+  /* ── LIGHT MODE ───────────────────────────────────────────── */
+  body.light-mode {
+    --bg: #F8F4EF;
+    --surface: #FFFFFF;
+    --surface2: #EDE8E2;
+    --border: #D8D0C8;
+    --text: #2C2620;
+    --muted: #7a6e66;
+    --danger: #cc3030;
+  }
+  body.light-mode .login-screen { background: var(--bg); }
+  body.light-mode .upload-zone { background: var(--surface); }
+  body.light-mode .stat-card { background: var(--surface); }
+  body.light-mode tbody tr:hover { background: var(--surface2); }
+  body.light-mode .drawer { background: var(--surface); }
+  body.light-mode .modal { background: var(--surface); }
+  body.light-mode .editor-popup { background: var(--surface2); }
+  body.light-mode .match-result { background: var(--surface2); }
+  body.light-mode .company-card { background: var(--surface); }
+  body.light-mode .search-wrap input { background: var(--surface); }
+  body.light-mode thead th { background: var(--bg); }
+  body.light-mode .parse-status { background: var(--surface); }
+
+  /* Theme toggle button */
+  .theme-toggle {
+    background: none; border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px; cursor: pointer;
+    font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600;
+    color: var(--muted); transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+  }
+  .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
 </style>
 </head>
 <body>
@@ -883,6 +934,7 @@
     <div class="nav-tag">Talent Platform</div>
     <div id="navUser" style="font-size:12px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);padding:5px 12px;border-radius:20px;">—</div>
     <div id="nav-count" style="font-size:13px;color:var(--muted);">0 candidates</div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
     <button onclick="logout()" style="font-size:11px;color:var(--muted);background:none;border:1px solid var(--border);padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;" onmouseover="this.style.color='#ff5e5e';this.style.borderColor='#ff5e5e'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">Sign out</button>
   </div>
 </nav>
@@ -1101,6 +1153,7 @@ function showLogin() {
 
 function showApp() {
   document.getElementById('loginScreen').classList.add('hidden');
+  applyStoredTheme();
   const name = currentUser.email.split('@')[0];
   document.getElementById('navUser').textContent = '👤 ' + name;
   setAccent(ACCENT_CANDIDATES); // start on candidates with violet
