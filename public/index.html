@@ -528,6 +528,8 @@
     font-size: 13px;
     color: var(--muted);
     margin-top: 3px;
+    font-family: 'Lora', serif;
+    font-style: italic;
   }
 
   .detail-section { margin-bottom: 24px; }
@@ -1449,13 +1451,13 @@ function renderTable() {
   }
 
   body.innerHTML = filtered.map((c, i) => `
-    <tr class="new-row" style="animation-delay:${i * 0.04}s" onclick="openDrawer(${c.id})">
+    <tr class="new-row" style="animation-delay:${i * 0.04}s" onclick="openDrawer('${c.id}')">
       <td>
         <div class="candidate-name">
           <div class="avatar" style="${getAvatarStyle(c.name || 'U')}">${getInitials(c.name || 'UN')}</div>
           <div>
             <div>${c.name || 'Unknown'}</div>
-            <div style="font-size:11px;color:var(--muted);font-family:'DM Sans';font-weight:400;margin-top:2px">${c.currentRole || 'Role not specified'}</div>
+            <div style="font-size:11px;color:var(--muted);font-family:'Lora',serif;font-style:italic;margin-top:2px">${c.currentRole || 'Role not specified'}</div>
           </div>
         </div>
       </td>
@@ -1463,13 +1465,13 @@ function renderTable() {
         <span>📍</span>${c.location || 'Not specified'}
       </td>
       <td onclick="event.stopPropagation()">
-        <div class="editable-cell" onclick="openFieldEditor(${c.id}, this)">
+        <div class="editable-cell" onclick="openFieldEditor('${c.id}', this)">
           <span class="field-badge" ${getFieldBadge(c.field)}>${c.field || 'Other'}</span>
           <span class="edit-hint">✏️</span>
         </div>
       </td>
       <td onclick="event.stopPropagation()">
-        <div class="editable-cell" onclick="openStatusEditor(${c.id}, this)">
+        <div class="editable-cell" onclick="openStatusEditor('${c.id}', this)">
           <span class="status-dot status-${c.status}"></span>
           <span class="status-label">${c.status.charAt(0).toUpperCase() + c.status.slice(1)}</span>
           <span class="edit-hint">✏️</span>
@@ -1720,7 +1722,7 @@ function openDrawer(id) {
       <div class="section-label">Update Status</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         ${['new','shortlisted','interviewing','placed'].map(s => `
-          <div class="filter-chip ${c.status === s ? 'active' : ''}" onclick="updateStatus(${c.id},'${s}')">
+          <div class="filter-chip ${c.status === s ? 'active' : ''}" onclick="updateStatus('${c.id}','${s}')">
             ${s.charAt(0).toUpperCase() + s.slice(1)}
           </div>
         `).join('')}
