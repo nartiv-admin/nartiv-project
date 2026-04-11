@@ -4,25 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nartiv – Talent Platform</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-// ── THEME TOGGLE ──────────────────────────────────────────────
-function toggleTheme() {
-  const isLight = document.body.classList.toggle('light-mode');
-  const btn = document.getElementById('themeToggle');
-  btn.textContent = isLight ? '🌙 Dark' : '☀️ Light';
-  localStorage.setItem('nartiv-theme', isLight ? 'light' : 'dark');
-}
-
-function applyStoredTheme() {
-  const stored = localStorage.getItem('nartiv-theme');
-  if (stored === 'light') {
-    document.body.classList.add('light-mode');
-    const btn = document.getElementById('themeToggle');
-    if (btn) btn.textContent = '🌙 Dark';
-  }
-}
-
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -2043,6 +2025,25 @@ function closeMatchDrawerDirect() {
   document.getElementById('matchDrawerOverlay').classList.remove('open');
 }
 
+
+// ── THEME TOGGLE ──────────────────────────────────────────────
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  const btn = document.getElementById('themeToggle');
+  btn.textContent = isLight ? '🌙 Dark' : '☀️ Light';
+  localStorage.setItem('nartiv-theme', isLight ? 'light' : 'dark');
+}
+
+function applyStoredTheme() {
+  const stored = localStorage.getItem('nartiv-theme');
+  if (stored === 'light') {
+    document.body.classList.add('light-mode');
+    const btn = document.getElementById('themeToggle');
+    if (btn) btn.textContent = '🌙 Dark';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', applyStoredTheme);
 </script>
 </body>
 </html>
