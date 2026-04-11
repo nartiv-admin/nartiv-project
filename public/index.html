@@ -1131,6 +1131,10 @@ async function loadCandidates() {
     id: c.id, name: c.name, email: c.email, location: c.location,
     field: c.field, currentRole: c.current_position, experience: c.experience,
     skills: c.skills || [], status: c.status || 'new',
+    industry: c.industry || null,
+    mbti: c.mbti || null,
+    salaryMin: c.salary_min || null,
+    salaryMax: c.salary_max || null,
     addedDate: (c.created_at || '').slice(0, 10),
     addedBy: c.added_by,
   }));
@@ -1142,6 +1146,10 @@ async function saveCandidateToDB(candidate) {
     name: candidate.name, email: candidate.email, location: candidate.location,
     field: candidate.field, current_position: candidate.currentRole,
     experience: candidate.experience, skills: candidate.skills || [],
+    industry: candidate.industry || null,
+    mbti: candidate.mbti || null,
+    salary_min: candidate.salaryMin || null,
+    salary_max: candidate.salaryMax || null,
     status: 'new',
     added_by: currentUser?.id || null,
   }]).select().single();
@@ -1369,6 +1377,7 @@ Return ONLY a JSON object (no markdown, no explanation) with these exact keys:
   "name": "Full name",
   "location": "City, Country or just Country",
   "field": "Main professional field (pick ONE from: Technology, Finance, Marketing, Healthcare, Design, Operations, Sales, Education, Other)",
+  "industry": "The industry sector they have worked in (e.g. Fashion, Tech, Banking, Retail, Healthcare, Media, Real Estate, etc.) — be specific",
   "currentRole": "Current or most recent job title",
   "email": "Email if found, else null",
   "skills": ["skill1", "skill2", "skill3"],
@@ -1616,6 +1625,14 @@ function openDrawer(id) {
   const c = candidates.find(x => x.id === id);
   if (!c) return;
 
+  const salaryLabel = c.salaryMin && c.salaryMax
+    ? `$${c.salaryMin.toLocaleString()} – $${c.salaryMax.toLocaleString()}`
+    : c.salaryMin ? `$${c.salaryMin.toLocaleString()}+`
+    : 'Not specified';
+
+  const MBTI_TYPES = ['INTJ','INTP','ENTJ','ENTP','INFJ','INFP','ENFJ','ENFP','ISTJ','ISFJ','ESTJ','ESFJ','ISTP','ISFP','ESTP','ESFP'];
+  const INDUSTRIES = ['Fashion','Tech','Banking & Finance','Retail','Healthcare','Media & Entertainment','Real Estate','Education','Manufacturing','Consulting','Legal','Non-profit','Government','Other'];
+
   const content = document.getElementById('drawerContent');
   content.innerHTML = `
     <div class="profile-header">
@@ -1635,6 +1652,15 @@ function openDrawer(id) {
       <div class="detail-row">
         <span class="detail-key">Field</span>
         <span class="detail-val"><span class="field-badge" ${getFieldBadge(c.field)}>${c.field || 'Other'}</span></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-key">Industry</span>
+        <span class="detail-val">
+          <select onchange="updateCandidateExtra('${c.id}','industry',this.value)" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:12px;outline:none;">
+            <option value="">Not specified</option>
+            ${INDUSTRIES.map(i => `<option value="${i}" ${c.industry===i?'selected':''}>${i}</option>`).join('')}
+          </select>
+        </span>
       </div>
       <div class="detail-row">
         <span class="detail-key">Experience</span>
@@ -1657,6 +1683,31 @@ function openDrawer(id) {
       </div>
     </div>
 
+    <div class="detail-section">
+      <div class="section-label">Additional Info</div>
+      <div class="detail-row">
+        <span class="detail-key">MBTI</span>
+        <span class="detail-val">
+          <select onchange="updateCandidateExtra('${c.id}','mbti',this.value)" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:12px;outline:none;">
+            <option value="">Not specified</option>
+            ${MBTI_TYPES.map(m => `<option value="${m}" ${c.mbti===m?'selected':''}>${m}</option>`).join('')}
+          </select>
+        </span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-key">Salary Range</span>
+        <span class="detail-val" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span style="font-size:11px;color:var(--muted)">$</span>
+          <input type="number" placeholder="Min" value="${c.salaryMin||''}" onchange="updateCandidateSalary('${c.id}','min',this.value)"
+            style="width:80px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:12px;outline:none;">
+          <span style="color:var(--muted)">–</span>
+          <input type="number" placeholder="Max" value="${c.salaryMax||''}" onchange="updateCandidateSalary('${c.id}','max',this.value)"
+            style="width:80px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:12px;outline:none;">
+          <span style="font-size:11px;color:var(--muted)">CAD/year</span>
+        </span>
+      </div>
+    </div>
+
     ${c.skills?.length ? `
     <div class="detail-section">
       <div class="section-label">Skills</div>
@@ -1665,13 +1716,6 @@ function openDrawer(id) {
       </div>
     </div>` : ''}
 
-    ${c.cvUrl ? `
-    <div class="detail-section">
-      <div class="section-label">CV File</div>
-      <a href="${c.cvUrl}" target="_blank" style="display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;text-decoration:none;color:var(--text);font-size:13px;font-weight:500;margin-top:4px">
-        📄 ${c.cvFilename || 'View CV'} <span style="margin-left:auto;color:var(--accent);font-size:11px">Download ↗</span>
-      </a>
-    </div>` : ''}
     <div class="detail-section">
       <div class="section-label">Update Status</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -1694,6 +1738,27 @@ async function updateStatus(id, status) {
     await updateCandidateInDB(id, { status });
     renderTable(); openDrawer(id);
   }
+}
+
+async function updateCandidateExtra(id, field, value) {
+  const c = candidates.find(x => x.id === id);
+  if (!c) return;
+  c[field] = value || null;
+  const dbField = field; // industry and mbti match DB column names
+  const { error } = await sb.from('candidates').update({ [dbField]: value || null }).eq('id', id);
+  if (error) showToast('⚠️ Error updating ' + field);
+  else showToast(`✅ ${field.charAt(0).toUpperCase()+field.slice(1)} updated`);
+}
+
+async function updateCandidateSalary(id, type, value) {
+  const c = candidates.find(x => x.id === id);
+  if (!c) return;
+  const num = parseInt(value) || null;
+  const col = type === 'min' ? 'salary_min' : 'salary_max';
+  if (type === 'min') c.salaryMin = num; else c.salaryMax = num;
+  const { error } = await sb.from('candidates').update({ [col]: num }).eq('id', id);
+  if (error) showToast('⚠️ Error updating salary');
+  else showToast(`✅ Salary ${type} updated`);
 }
 
 function closeDrawer(e) {
