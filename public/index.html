@@ -4,16 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nartiv – Talent Platform</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0d0d0f;
     --surface: #16161a;
     --surface2: #1e1e24;
     --border: #2a2a35;
-    --accent: #7B2FBE;
-    --accent-rgb: 123,47,190;
+    --accent: #c8f04e;
     --accent2: #7b61ff;
     --text: #f0f0f0;
     --muted: #7a7a90;
@@ -25,7 +23,7 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     min-height: 100vh;
   }
 
@@ -39,56 +37,14 @@
   }
 
   .logo {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-weight: 800;
     font-size: 22px;
     letter-spacing: -0.5px;
   }
 
-  .logo span { color: inherit; }
+  .logo span { color: var(--accent); }
 
-  .nav-tab {
-    font-family: "Space Grotesk", sans-serif; font-size: 12px; font-weight: 700;
-    letter-spacing: 0.5px; padding: 7px 16px; border-radius: 8px;
-    cursor: pointer; transition: all 0.2s; color: var(--muted);
-    border: 1px solid transparent;
-  }
-  .nav-tab:hover { color: var(--text); background: var(--surface2); }
-  .nav-tab.active { color: var(--accent); background: rgba(var(--accent-rgb),0.1); border-color: rgba(var(--accent-rgb),0.25); }
-  .companies-wrap { display: none; flex-direction: column; height: 100%; }
-  .companies-wrap.active { display: flex; }
-  .company-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; padding: 24px 32px; overflow-y: auto; flex: 1; }
-  .company-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; transition: border-color 0.2s; cursor: pointer; }
-  .company-card:hover { border-color: var(--accent2); }
-  .company-name { font-family: "Space Grotesk", sans-serif; font-size: 16px; font-weight: 700; }
-  .company-industry { font-size: 12px; color: var(--muted); margin-top: 3px; }
-  .contract-badge { font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; }
-  .badge-active { background: rgba(29,209,161,0.15); color: #1dd1a1; border: 1px solid rgba(29,209,161,0.3); }
-  .badge-prospect { background: rgba(var(--accent-rgb),0.1); color: var(--accent); border: 1px solid rgba(var(--accent-rgb),0.25); }
-  .badge-closed { background: rgba(255,94,94,0.1); color: #ff5e5e; border: 1px solid rgba(255,94,94,0.2); }
-  .company-roles { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
-  .role-tag { font-size: 11px; padding: 3px 10px; border-radius: 6px; background: rgba(123,97,255,0.12); border: 1px solid rgba(123,97,255,0.2); color: #a090ff; }
-  .company-notes { font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
-  .company-toolbar { padding: 20px 32px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
-  .add-company-btn { display: flex; align-items: center; gap: 6px; background: var(--accent); color: #0d0d0f; border: none; border-radius: 8px; padding: 10px 20px; font-family: "Space Grotesk", sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; }
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 200; align-items: center; justify-content: center; }
-  .modal-overlay.open { display: flex; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; width: 100%; max-width: 500px; }
-  .modal h2 { font-family: "Space Grotesk", sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 20px; }
-  .modal-fields { display: flex; flex-direction: column; gap: 14px; }
-  .modal-field { display: flex; flex-direction: column; gap: 5px; }
-  .modal-field label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
-  .modal-field input, .modal-field select, .modal-field textarea { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 11px 14px; color: var(--text); font-family: "Space Grotesk", sans-serif; font-size: 14px; outline: none; }
-  .modal-field input::placeholder, .modal-field textarea::placeholder { color: var(--muted); }
-  .modal-field textarea { resize: vertical; min-height: 80px; }
-  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
-  .btn-cancel { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); border-radius: 8px; padding: 10px 20px; font-family: "Space Grotesk", sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; }
-  .btn-save { background: var(--accent); color: #0d0d0f; border: none; border-radius: 8px; padding: 10px 20px; font-family: "Space Grotesk", sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; }
-  .match-result { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 12px; }
-  .match-score { font-family: "Space Grotesk", sans-serif; font-size: 22px; font-weight: 800; color: var(--accent); }
-  .match-name { font-family: "Space Grotesk", sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-  .match-reason { font-size: 12px; color: var(--muted); line-height: 1.6; }
-  .match-btn { width: 100%; background: var(--accent2); color: #fff; border: none; border-radius: 8px; padding: 12px; font-family: "Space Grotesk", sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; margin-top: 16px; }
   .nav-tag {
     font-size: 11px;
     font-weight: 500;
@@ -119,7 +75,7 @@
   }
 
   .section-label {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 2.5px;
@@ -152,14 +108,14 @@
   .upload-icon {
     width: 44px; height: 44px;
     border-radius: 10px;
-    background: rgba(var(--accent-rgb),0.12);
+    background: rgba(200,240,78,0.12);
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 14px;
     font-size: 20px;
   }
 
   .upload-zone h3 {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-size: 15px;
     font-weight: 700;
     margin-bottom: 6px;
@@ -185,8 +141,8 @@
     letter-spacing: 1px;
     text-transform: uppercase;
     color: var(--accent);
-    background: rgba(var(--accent-rgb),0.1);
-    border: 1px solid rgba(var(--accent-rgb),0.2);
+    background: rgba(200,240,78,0.1);
+    border: 1px solid rgba(200,240,78,0.2);
     padding: 3px 8px;
     border-radius: 4px;
   }
@@ -256,7 +212,7 @@
   }
 
   .stat-num {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-size: 26px;
     font-weight: 800;
     color: var(--accent);
@@ -297,7 +253,7 @@
     border-radius: 8px;
     padding: 10px 16px 10px 40px;
     color: var(--text);
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 14px;
     outline: none;
     transition: border-color 0.2s;
@@ -325,13 +281,13 @@
     cursor: pointer;
     transition: all 0.15s;
     white-space: nowrap;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'DM Sans', sans-serif;
   }
 
   .filter-chip:hover, .filter-chip.active {
     border-color: var(--accent);
     color: var(--accent);
-    background: rgba(var(--accent-rgb),0.06);
+    background: rgba(200,240,78,0.06);
   }
 
   /* TABLE */
@@ -348,7 +304,7 @@
   }
 
   thead th {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 2px;
@@ -378,7 +334,7 @@
   }
 
   .candidate-name {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-weight: 700;
     font-size: 14px;
     display: flex;
@@ -392,7 +348,7 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 13px;
     font-weight: 700;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Syne', sans-serif;
     flex-shrink: 0;
   }
 
@@ -438,7 +394,7 @@
   .empty-state .empty-icon { font-size: 40px; margin-bottom: 16px; }
 
   .empty-state h3 {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-size: 18px;
     font-weight: 700;
     color: var(--text);
@@ -479,7 +435,7 @@
   }
 
   .drawer-close h2 {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-size: 18px;
     font-weight: 800;
   }
@@ -515,11 +471,11 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 20px;
     font-weight: 800;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Syne', sans-serif;
   }
 
   .profile-info h3 {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-size: 17px;
     font-weight: 700;
   }
@@ -644,7 +600,7 @@
   }
 
   .editor-title {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 2px;
@@ -670,7 +626,7 @@
   }
 
   .editor-option:hover { background: rgba(255,255,255,0.07); }
-  .editor-option.selected { background: rgba(var(--accent-rgb),0.08); }
+  .editor-option.selected { background: rgba(200,240,78,0.08); }
 
   .editor-divider {
     height: 1px;
@@ -691,7 +647,7 @@
     border-radius: 7px;
     padding: 7px 10px;
     color: var(--text);
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 12px;
     outline: none;
   }
@@ -704,7 +660,7 @@
     border: none;
     border-radius: 7px;
     padding: 7px 12px;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-size: 11px;
     font-weight: 700;
     cursor: pointer;
@@ -726,7 +682,7 @@
     border: 1px solid var(--border);
     border-radius: 10px;
     color: var(--text);
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
@@ -738,7 +694,7 @@
   .folder-btn:hover {
     border-color: var(--accent);
     color: var(--accent);
-    background: rgba(var(--accent-rgb),0.06);
+    background: rgba(200,240,78,0.06);
   }
 
   .folder-btn input[type="file"] {
@@ -784,13 +740,13 @@
   }
 
   .login-logo {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-weight: 800;
     font-size: 28px;
     letter-spacing: -0.5px;
   }
 
-  .login-logo span { color: inherit; }
+  .login-logo span { color: var(--accent); }
 
   .login-tagline {
     font-size: 13px;
@@ -813,7 +769,7 @@
     border-radius: 10px;
     padding: 13px 16px;
     color: var(--text);
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 14px;
     outline: none;
     transition: border-color 0.2s;
@@ -829,7 +785,7 @@
     border: none;
     border-radius: 10px;
     padding: 14px;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
@@ -860,9 +816,9 @@
   <div class="login-box">
     <div class="login-lock">🔐</div>
     <div class="login-logo">NART<span>IV</span></div>
-    <div class="login-tagline">Talent Matching Platform — Secure Access</div>
+    <div class="login-tagline">Talent Matching Platform — Team Access</div>
     <div class="login-fields">
-      <input type="email" id="loginUser" placeholder="Email address (e.g. mai@yournartiv.com)" autocomplete="email">
+      <input type="text" id="loginUser" placeholder="Username" autocomplete="username">
       <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password"
         onkeydown="if(event.key==='Enter') attemptLogin()">
     </div>
@@ -873,15 +829,16 @@
 
 <nav>
   <div class="logo">NART<span>IV</span></div>
-  <div style="display:flex;align-items:center;gap:8px;">
-    <div class="nav-tab active" id="tabCandidates" onclick="switchTab('candidates')">👤 Candidates</div>
-    <div class="nav-tab" id="tabCompanies" onclick="switchTab('companies')">🏢 Companies</div>
-  </div>
   <div style="display:flex;align-items:center;gap:12px;">
     <div class="nav-tag">Talent Platform</div>
-    <div id="navUser" style="font-size:12px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);padding:5px 12px;border-radius:20px;">—</div>
     <div id="nav-count" style="font-size:13px;color:var(--muted);">0 candidates</div>
-    <button onclick="logout()" style="font-size:11px;color:var(--muted);background:none;border:1px solid var(--border);padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;" onmouseover="this.style.color='#ff5e5e';this.style.borderColor='#ff5e5e'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">Sign out</button>
+    <div class="filter-chip" onclick="logout()" style="font-size:11px;padding:5px 10px;">Sign out</div>
+  </div>
+</nav>
+  <div class="logo">NART<span>IV</span></div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="nav-tag">Talent Platform</div>
+    <div id="nav-count" style="font-size:13px;color:var(--muted);">0 candidates</div>
   </div>
 </nav>
 
@@ -983,79 +940,7 @@
   </div>
 </div>
 
-<!-- COMPANIES VIEW -->
-<div class="companies-wrap" id="companiesWrap">
-  <div class="company-toolbar">
-    <button class="add-company-btn" onclick="openAddCompany()">+ Add Company</button>
-    <div style="flex:1;font-size:13px;color:var(--muted);" id="companyCount">0 companies</div>
-  </div>
-  <div class="company-grid" id="companyGrid">
-    <div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--muted);">
-      <div style="font-size:36px;margin-bottom:16px;">🏢</div>
-      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;">No companies yet</div>
-      <div style="font-size:14px;">Click "Add Company" to add your first client or prospect</div>
-    </div>
-  </div>
-</div>
-
-<!-- ADD COMPANY MODAL -->
-<div class="modal-overlay" id="companyModal">
-  <div class="modal">
-    <h2>Add Company</h2>
-    <div class="modal-fields">
-      <div class="modal-field">
-        <label>Company Name *</label>
-        <input type="text" id="coName" placeholder="e.g. Acme Inc.">
-      </div>
-      <div class="modal-field">
-        <label>Industry</label>
-        <select id="coIndustry">
-          <option value="">Select industry</option>
-          <option>Technology</option><option>Finance</option><option>Marketing</option>
-          <option>Healthcare</option><option>Design</option><option>Operations</option>
-          <option>Sales</option><option>Education</option><option>Retail</option><option>Other</option>
-        </select>
-      </div>
-      <div class="modal-field">
-        <label>Contract Status</label>
-        <select id="coStatus">
-          <option value="prospect">Prospect</option>
-          <option value="active">Active</option>
-          <option value="closed">Closed</option>
-        </select>
-      </div>
-      <div class="modal-field">
-        <label>Location</label>
-        <input type="text" id="coLocation" placeholder="e.g. Montréal, QC">
-      </div>
-      <div class="modal-field">
-        <label>Open Roles (one per line)</label>
-        <textarea id="coRoles" placeholder="e.g.&#10;Senior Developer&#10;Marketing Manager"></textarea>
-      </div>
-      <div class="modal-field">
-        <label>Notes</label>
-        <textarea id="coNotes" placeholder="Any relevant details about this company..."></textarea>
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeAddCompany()">Cancel</button>
-      <button class="btn-save" onclick="saveCompany()">Save Company</button>
-    </div>
-  </div>
-</div>
-
-<!-- MATCH DRAWER -->
-<div class="drawer-overlay" id="matchDrawerOverlay" onclick="closeMatchDrawer(event)">
-  <div class="drawer" id="matchDrawer">
-    <div class="drawer-close">
-      <h2 id="matchDrawerTitle">AI Match</h2>
-      <button class="btn-close" onclick="closeMatchDrawerDirect()">✕</button>
-    </div>
-    <div id="matchDrawerContent"></div>
-  </div>
-</div>
-
-
+<!-- DRAWER -->
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer(event)">
   <div class="drawer" id="drawer">
     <div class="drawer-close">
@@ -1075,106 +960,42 @@
 <script>
 // ─── AUTH ─────────────────────────────────────────
 // Add your team's credentials here
-// ── SUPABASE ──────────────────────────────────────────────
-const sb = supabase.createClient(
-  'https://qppbykswuuimddkbizmp.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwcGJ5a3N3dXVpbWRka2Jpem1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwNjk3ODcsImV4cCI6MjA5MDY0NTc4N30.4Srty0TgT5vAM1tHrt16IMyZbO2JuhLCcoP_ZrmzzJI'
-);
+const USERS = {
+  'mai':   'nartiv2024',
+  'erika': 'nartiv2024',
+  'admin': 'nartiv2024',
+};
 
-let currentUser = null;
-
-async function initAuth() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (session) { currentUser = session.user; showApp(); }
-  sb.auth.onAuthStateChange((_e, session) => {
-    if (session) { currentUser = session.user; showApp(); }
-    else { currentUser = null; showLogin(); }
-  });
+function checkAuth() {
+  const loggedIn = sessionStorage.getItem('nartiv_auth');
+  if (loggedIn === 'true') {
+    document.getElementById('loginScreen').classList.add('hidden');
+  }
 }
 
-function showLogin() {
-  document.getElementById('loginScreen').classList.remove('hidden');
-  candidates = []; renderTable();
-}
-
-function showApp() {
-  document.getElementById('loginScreen').classList.add('hidden');
-  const name = currentUser.email.split('@')[0];
-  document.getElementById('navUser').textContent = '👤 ' + name;
-  setAccent(ACCENT_CANDIDATES); // start on candidates with violet
-  loadCandidates();
-}
-
-async function checkAuth() { await initAuth(); }
-
-async function attemptLogin() {
-  const email = document.getElementById('loginUser').value.trim();
-  const pass  = document.getElementById('loginPass').value;
+function attemptLogin() {
+  const user = document.getElementById('loginUser').value.trim().toLowerCase();
+  const pass = document.getElementById('loginPass').value;
   const error = document.getElementById('loginError');
-  const btn   = document.querySelector('.login-btn');
-  if (!email || !pass) { error.textContent = 'Please enter your email and password.'; return; }
-  btn.disabled = true; btn.textContent = 'Signing in…'; error.textContent = '';
-  const { error: err } = await sb.auth.signInWithPassword({ email, password: pass });
-  btn.disabled = false; btn.textContent = 'Enter Platform →';
-  if (err) { error.textContent = 'Incorrect email or password.'; document.getElementById('loginPass').value = ''; }
+
+  if (USERS[user] && USERS[user] === pass) {
+    sessionStorage.setItem('nartiv_auth', 'true');
+    sessionStorage.setItem('nartiv_user', user);
+    document.getElementById('loginScreen').classList.add('hidden');
+    error.textContent = '';
+  } else {
+    error.textContent = 'Incorrect username or password.';
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginPass').focus();
+  }
 }
 
-async function logout() {
-  await sb.auth.signOut();
-}
-
-// ── DATABASE ──────────────────────────────────────────────
-async function loadCandidates() {
-  const { data, error } = await sb.from('candidates').select('*').order('created_at', { ascending: false });
-  if (error) { showToast('⚠️ Error loading candidates'); return; }
-  candidates = (data || []).map(c => ({
-    id: c.id, name: c.name, email: c.email, location: c.location,
-    field: c.field, currentRole: c.current_position, experience: c.experience,
-    skills: c.skills || [], status: c.status || 'new',
-    industry: c.industry || null,
-    mbti: c.mbti || null,
-    salaryMin: c.salary_min || null,
-    salaryMax: c.salary_max || null,
-    addedDate: (c.created_at || '').slice(0, 10),
-    addedBy: c.added_by,
-  }));
-  updateStats(); renderTable(); renderFieldBreakdown();
-}
-
-async function saveCandidateToDB(candidate) {
-  const { data, error } = await sb.from('candidates').insert([{
-    name: candidate.name, email: candidate.email, location: candidate.location,
-    field: candidate.field, current_position: candidate.currentRole,
-    experience: candidate.experience, skills: candidate.skills || [],
-    industry: candidate.industry || null,
-    mbti: candidate.mbti || null,
-    salary_min: candidate.salaryMin || null,
-    salary_max: candidate.salaryMax || null,
-    status: 'new',
-    added_by: currentUser?.id || null,
-  }]).select().single();
-  if (error) { console.error(error); showToast('⚠️ Error saving to database'); return null; }
-  return { id: data.id, ...candidate, addedDate: data.created_at.slice(0,10), addedBy: data.added_by };
-}
-
-async function updateCandidateInDB(id, updates) {
-  const dbUpdates = {};
-  if (updates.field !== undefined) dbUpdates.field = updates.field;
-  if (updates.status !== undefined) dbUpdates.status = updates.status;
-  const { error } = await sb.from('candidates').update(dbUpdates).eq('id', id);
-  if (error) console.error('Update error:', error);
-}
-
-async function uploadCVToStorage(file, candidateName) {
-  const ext = file.name.split('.').pop();
-  const safe = (candidateName || 'candidate').replace(/[^a-z0-9]/gi,'_').toLowerCase();
-  const path = `cvs/${Date.now()}_${safe}.${ext}`;
-  const { error } = await sb.storage.from('candidate-files').upload(path, file, {
-    contentType: file.type || 'application/octet-stream', upsert: false
-  });
-  if (error) { console.error('Storage error:', error); return null; }
-  const { data } = sb.storage.from('candidate-files').getPublicUrl(path);
-  return { url: data.publicUrl, filename: file.name };
+function logout() {
+  sessionStorage.removeItem('nartiv_auth');
+  sessionStorage.removeItem('nartiv_user');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
 }
 
 // Run auth check on load
@@ -1209,13 +1030,13 @@ function getInitials(name) {
 // Field badge colors
 const fieldColors = {
   'Technology': ['rgba(123,97,255,0.15)','rgba(123,97,255,0.3)','#a090ff'],
-  'Finance': ['rgba(var(--accent-rgb),0.1)','rgba(var(--accent-rgb),0.25)','#c8f04e'],
+  'Finance': ['rgba(200,240,78,0.1)','rgba(200,240,78,0.25)','#c8f04e'],
   'Marketing': ['rgba(255,107,157,0.1)','rgba(255,107,157,0.25)','#ff8ab5'],
   'Healthcare': ['rgba(29,209,161,0.1)','rgba(29,209,161,0.25)','#1dd1a1'],
   'Design': ['rgba(72,219,251,0.1)','rgba(72,219,251,0.25)','#48dbfb'],
   'Operations': ['rgba(255,159,67,0.1)','rgba(255,159,67,0.25)','#ff9f43'],
   'Sales': ['rgba(255,94,94,0.1)','rgba(255,94,94,0.25)','#ff7a7a'],
-  'Education': ['rgba(var(--accent-rgb),0.08)','rgba(var(--accent-rgb),0.2)','#b5d93d'],
+  'Education': ['rgba(200,240,78,0.08)','rgba(200,240,78,0.2)','#b5d93d'],
 };
 
 function getFieldBadge(field) {
@@ -1284,22 +1105,15 @@ async function processFile(file) {
   document.getElementById('parseBar').style.width = '0%';
 
   if (candidate) {
-    // Upload CV to Supabase Storage
-    updateParseLabel('Uploading CV securely to encrypted storage…');
-    let cvData = null;
-    try { cvData = await uploadCVToStorage(file, candidate.name); } catch(e) { console.error(e); }
-    candidate.cvUrl = cvData?.url || null;
-    candidate.cvFilename = cvData?.filename || file.name;
-
-    // Save to Supabase database
-    const saved = await saveCandidateToDB(candidate);
-    if (saved) {
-      candidates.unshift(saved);
-      updateStats();
-      renderTable();
-      renderFieldBreakdown();
-      showToast(`✅ ${candidate.name} saved securely`);
-    }
+    candidate.id = Date.now();
+    candidate.status = 'new';
+    candidate.addedDate = new Date().toLocaleDateString('en-CA');
+    candidates.unshift(candidate);
+    todayCount++;
+    updateStats();
+    renderTable();
+    renderFieldBreakdown();
+    showToast(`✅ ${candidate.name} added to database`);
   } else {
     showToast('⚠️ Could not extract candidate info');
   }
@@ -1377,7 +1191,6 @@ Return ONLY a JSON object (no markdown, no explanation) with these exact keys:
   "name": "Full name",
   "location": "City, Country or just Country",
   "field": "Main professional field (pick ONE from: Technology, Finance, Marketing, Healthcare, Design, Operations, Sales, Education, Other)",
-  "industry": "The industry sector they have worked in (e.g. Fashion, Tech, Banking, Retail, Healthcare, Media, Real Estate, etc.) — be specific",
   "currentRole": "Current or most recent job title",
   "email": "Email if found, else null",
   "skills": ["skill1", "skill2", "skill3"],
@@ -1514,24 +1327,16 @@ function openFieldEditor(id, el) {
   setTimeout(() => document.getElementById('customFieldInput')?.focus(), 50);
 }
 
-async function saveField(id, field) {
+function saveField(id, field) {
   const c = candidates.find(x => x.id === id);
-  if (c) {
-    c.field = field;
-    await updateCandidateInDB(id, { field });
-    closeAllEditors(); renderTable(); renderFieldBreakdown(); showToast(`✅ Field updated to ${field}`);
-  }
+  if (c) { c.field = field; closeAllEditors(); renderTable(); renderFieldBreakdown(); showToast(`✅ Field updated to ${field}`); }
 }
 
-async function saveCustomField(id) {
+function saveCustomField(id) {
   const val = document.getElementById('customFieldInput')?.value.trim();
   if (!val) return;
   const c = candidates.find(x => x.id === id);
-  if (c) {
-    c.field = val;
-    await updateCandidateInDB(id, { field: val });
-    closeAllEditors(); renderTable(); renderFieldBreakdown(); showToast(`✅ Field updated to ${val}`);
-  }
+  if (c) { c.field = val; closeAllEditors(); renderTable(); renderFieldBreakdown(); showToast(`✅ Field updated to ${val}`); }
 }
 
 function openStatusEditor(id, el) {
@@ -1625,14 +1430,6 @@ function openDrawer(id) {
   const c = candidates.find(x => x.id === id);
   if (!c) return;
 
-  const salaryLabel = c.salaryMin && c.salaryMax
-    ? `$${c.salaryMin.toLocaleString()} – $${c.salaryMax.toLocaleString()}`
-    : c.salaryMin ? `$${c.salaryMin.toLocaleString()}+`
-    : 'Not specified';
-
-  const MBTI_TYPES = ['INTJ','INTP','ENTJ','ENTP','INFJ','INFP','ENFJ','ENFP','ISTJ','ISFJ','ESTJ','ESFJ','ISTP','ISFP','ESTP','ESFP'];
-  const INDUSTRIES = ['Fashion','Tech','Banking & Finance','Retail','Healthcare','Media & Entertainment','Real Estate','Education','Manufacturing','Consulting','Legal','Non-profit','Government','Other'];
-
   const content = document.getElementById('drawerContent');
   content.innerHTML = `
     <div class="profile-header">
@@ -1652,15 +1449,6 @@ function openDrawer(id) {
       <div class="detail-row">
         <span class="detail-key">Field</span>
         <span class="detail-val"><span class="field-badge" ${getFieldBadge(c.field)}>${c.field || 'Other'}</span></span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-key">Industry</span>
-        <span class="detail-val">
-          <select onchange="updateCandidateExtra('${c.id}','industry',this.value)" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:12px;outline:none;">
-            <option value="">Not specified</option>
-            ${INDUSTRIES.map(i => `<option value="${i}" ${c.industry===i?'selected':''}>${i}</option>`).join('')}
-          </select>
-        </span>
       </div>
       <div class="detail-row">
         <span class="detail-key">Experience</span>
@@ -1683,31 +1471,6 @@ function openDrawer(id) {
       </div>
     </div>
 
-    <div class="detail-section">
-      <div class="section-label">Additional Info</div>
-      <div class="detail-row">
-        <span class="detail-key">MBTI</span>
-        <span class="detail-val">
-          <select onchange="updateCandidateExtra('${c.id}','mbti',this.value)" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:12px;outline:none;">
-            <option value="">Not specified</option>
-            ${MBTI_TYPES.map(m => `<option value="${m}" ${c.mbti===m?'selected':''}>${m}</option>`).join('')}
-          </select>
-        </span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-key">Salary Range</span>
-        <span class="detail-val" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-          <span style="font-size:11px;color:var(--muted)">$</span>
-          <input type="number" placeholder="Min" value="${c.salaryMin||''}" onchange="updateCandidateSalary('${c.id}','min',this.value)"
-            style="width:80px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:12px;outline:none;">
-          <span style="color:var(--muted)">–</span>
-          <input type="number" placeholder="Max" value="${c.salaryMax||''}" onchange="updateCandidateSalary('${c.id}','max',this.value)"
-            style="width:80px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:12px;outline:none;">
-          <span style="font-size:11px;color:var(--muted)">CAD/year</span>
-        </span>
-      </div>
-    </div>
-
     ${c.skills?.length ? `
     <div class="detail-section">
       <div class="section-label">Skills</div>
@@ -1719,7 +1482,7 @@ function openDrawer(id) {
     <div class="detail-section">
       <div class="section-label">Update Status</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        ${['new','shortlisted','interviewing','placed'].map(s => `
+        ${['new','shortlisted','interviewing'].map(s => `
           <div class="filter-chip ${c.status === s ? 'active' : ''}" onclick="updateStatus(${c.id},'${s}')">
             ${s.charAt(0).toUpperCase() + s.slice(1)}
           </div>
@@ -1731,34 +1494,9 @@ function openDrawer(id) {
   document.getElementById('drawerOverlay').classList.add('open');
 }
 
-async function updateStatus(id, status) {
+function updateStatus(id, status) {
   const c = candidates.find(x => x.id === id);
-  if (c) {
-    c.status = status;
-    await updateCandidateInDB(id, { status });
-    renderTable(); openDrawer(id);
-  }
-}
-
-async function updateCandidateExtra(id, field, value) {
-  const c = candidates.find(x => x.id === id);
-  if (!c) return;
-  c[field] = value || null;
-  const dbField = field; // industry and mbti match DB column names
-  const { error } = await sb.from('candidates').update({ [dbField]: value || null }).eq('id', id);
-  if (error) showToast('⚠️ Error updating ' + field);
-  else showToast(`✅ ${field.charAt(0).toUpperCase()+field.slice(1)} updated`);
-}
-
-async function updateCandidateSalary(id, type, value) {
-  const c = candidates.find(x => x.id === id);
-  if (!c) return;
-  const num = parseInt(value) || null;
-  const col = type === 'min' ? 'salary_min' : 'salary_max';
-  if (type === 'min') c.salaryMin = num; else c.salaryMax = num;
-  const { error } = await sb.from('candidates').update({ [col]: num }).eq('id', id);
-  if (error) showToast('⚠️ Error updating salary');
-  else showToast(`✅ Salary ${type} updated`);
+  if (c) { c.status = status; renderTable(); openDrawer(id); }
 }
 
 function closeDrawer(e) {
@@ -1778,212 +1516,6 @@ function showToast(msg) {
   clearTimeout(toastTimeout);
   toastTimeout = setTimeout(() => toast.classList.remove('show'), 3500);
 }
-
-// ─── TAB SWITCHING ───────────────────────────────
-let companies = [];
-
-// Accent colors per section
-const ACCENT_CANDIDATES = { color: '#7B2FBE', rgb: '123,47,190', name: 'violet' };   // Violet
-const ACCENT_COMPANIES  = { color: '#2BBCF0', rgb: '43,188,240', name: 'cerulean' }; // Cerulean
-
-function setAccent(a) {
-  const root = document.documentElement;
-  root.style.setProperty('--accent', a.color);
-  root.style.setProperty('--accent-rgb', a.rgb);
-  // Update all hardcoded rgba references dynamically
-  document.querySelectorAll('.nav-tab.active').forEach(el => {
-    el.style.color = a.color;
-    el.style.background = `rgba(${a.rgb},0.1)`;
-    el.style.borderColor = `rgba(${a.rgb},0.25)`;
-  });
-}
-
-function switchTab(tab) {
-  const mainEl = document.querySelector('.main');
-  const companiesWrap = document.getElementById('companiesWrap');
-  const tabCandidates = document.getElementById('tabCandidates');
-  const tabCompanies = document.getElementById('tabCompanies');
-
-  if (tab === 'candidates') {
-    mainEl.style.display = 'grid';
-    companiesWrap.classList.remove('active');
-    tabCandidates.classList.add('active');
-    tabCompanies.classList.remove('active');
-    setAccent(ACCENT_CANDIDATES);
-  } else {
-    mainEl.style.display = 'none';
-    companiesWrap.classList.add('active');
-    tabCandidates.classList.remove('active');
-    tabCompanies.classList.add('active');
-    setAccent(ACCENT_COMPANIES);
-    loadCompanies();
-  }
-}
-
-// ─── COMPANIES DB ─────────────────────────────────
-async function loadCompanies() {
-  const { data, error } = await sb.from('companies').select('*').order('created_at', { ascending: false });
-  if (error) { showToast('⚠️ Error loading companies'); return; }
-  companies = data || [];
-  renderCompanies();
-}
-
-async function saveCompany() {
-  const name = document.getElementById('coName').value.trim();
-  if (!name) { showToast('⚠️ Company name is required'); return; }
-  const rolesRaw = document.getElementById('coRoles').value;
-  const roles = rolesRaw.split('\n').map(r => r.trim()).filter(Boolean);
-
-  const { data, error } = await sb.from('companies').insert([{
-    name,
-    industry: document.getElementById('coIndustry').value || null,
-    contract_status: document.getElementById('coStatus').value || 'prospect',
-    location: document.getElementById('coLocation').value.trim() || null,
-    open_roles: roles,
-    notes: document.getElementById('coNotes').value.trim() || null,
-    added_by: currentUser?.id || null,
-  }]).select().single();
-
-  if (error) { showToast('⚠️ Error saving company'); return; }
-  companies.unshift(data);
-  renderCompanies();
-  closeAddCompany();
-  showToast(`✅ ${name} added`);
-}
-
-// ─── RENDER COMPANIES ─────────────────────────────
-function renderCompanies() {
-  const grid = document.getElementById('companyGrid');
-  document.getElementById('companyCount').textContent = `${companies.length} compan${companies.length !== 1 ? 'ies' : 'y'}`;
-
-  if (!companies.length) {
-    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--muted);">
-      <div style="font-size:36px;margin-bottom:16px;">🏢</div>
-      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;">No companies yet</div>
-      <div style="font-size:14px;">Click "Add Company" to add your first client or prospect</div>
-    </div>`;
-    return;
-  }
-
-  grid.innerHTML = companies.map(c => {
-    const badgeClass = c.contract_status === 'active' ? 'badge-active' : c.contract_status === 'closed' ? 'badge-closed' : 'badge-prospect';
-    const badgeLabel = (c.contract_status || 'prospect').charAt(0).toUpperCase() + (c.contract_status || 'prospect').slice(1);
-    const roles = (c.open_roles || []).map(r => `<span class="role-tag">${r}</span>`).join('');
-    return `<div class="company-card" onclick="openMatchDrawer('${c.id}')">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
-        <div>
-          <div class="company-name">${c.name}</div>
-          <div class="company-industry">${c.industry || 'Industry not set'} ${c.location ? '· ' + c.location : ''}</div>
-        </div>
-        <span class="contract-badge ${badgeClass}">${badgeLabel}</span>
-      </div>
-      ${roles ? `<div class="company-roles">${roles}</div>` : '<div style="font-size:12px;color:var(--muted);margin-top:8px;">No open roles added</div>'}
-      ${c.notes ? `<div class="company-notes">${c.notes}</div>` : ''}
-      <div style="margin-top:14px;font-size:11px;color:var(--accent);font-weight:600;">🤖 Click to find matching candidates →</div>
-    </div>`;
-  }).join('');
-}
-
-// ─── ADD COMPANY MODAL ────────────────────────────
-function openAddCompany() {
-  document.getElementById('companyModal').classList.add('open');
-  document.getElementById('coName').focus();
-}
-
-function closeAddCompany() {
-  document.getElementById('companyModal').classList.remove('open');
-  ['coName','coLocation','coRoles','coNotes'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('coIndustry').value = '';
-  document.getElementById('coStatus').value = 'prospect';
-}
-
-// ─── AI MATCHING ──────────────────────────────────
-async function openMatchDrawer(companyId) {
-  const company = companies.find(c => c.id === companyId);
-  if (!company) return;
-
-  document.getElementById('matchDrawerTitle').textContent = `Matches for ${company.name}`;
-  document.getElementById('matchDrawerContent').innerHTML = `<div class="match-loading">🤖 Claude is finding the best candidates…</div>`;
-  document.getElementById('matchDrawerOverlay').classList.add('open');
-
-  // Build candidate summaries
-  const candidateSummaries = candidates.map(c =>
-    `ID:${c.id}|Name:${c.name}|Field:${c.field}|Role:${c.currentRole}|Skills:${(c.skills||[]).join(',')}|Experience:${c.experience}|Location:${c.location}`
-  ).join('\n');
-
-  const prompt = `You are a talent matching expert at Nartiv, a recruitment agency.
-
-Company: ${company.name}
-Industry: ${company.industry || 'Not specified'}
-Location: ${company.location || 'Not specified'}
-Open Roles: ${(company.open_roles||[]).join(', ') || 'Not specified'}
-Notes: ${company.notes || 'None'}
-
-Candidates in database:
-${candidateSummaries || 'No candidates yet'}
-
-Return ONLY a JSON array (no markdown) of the top 3 best matching candidates, sorted by match score. Each object must have:
-{"id":"candidate_id","name":"name","score":85,"role":"which open role they match","reason":"2 sentence explanation"}
-
-If fewer than 3 candidates exist, return what you can. If none match well, return an empty array [].`;
-
-  try {
-    const res = await fetch('/api/claude', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 800,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-    const data = await res.json();
-    const raw = data.content?.map(b => b.text || '').join('');
-    const matches = JSON.parse(raw.replace(/```json|```/g, '').trim());
-    renderMatchResults(matches, company);
-  } catch (e) {
-    document.getElementById('matchDrawerContent').innerHTML = `<div style="color:#ff5e5e;font-size:14px;padding:20px">⚠️ Could not get matches. Try again.</div>`;
-  }
-}
-
-function renderMatchResults(matches, company) {
-  const el = document.getElementById('matchDrawerContent');
-  if (!matches.length) {
-    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted)">
-      <div style="font-size:32px;margin-bottom:12px">🔍</div>
-      <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--text);margin-bottom:8px">No strong matches yet</div>
-      <div style="font-size:13px">Upload more CVs to find candidates for ${company.name}</div>
-    </div>`;
-    return;
-  }
-
-  el.innerHTML = `
-    <div style="margin-bottom:20px">
-      <div class="section-label">Top Matches</div>
-      <p style="font-size:13px;color:var(--muted)">Based on open roles: <strong style="color:var(--text)">${(company.open_roles||[]).join(', ') || 'not specified'}</strong></p>
-    </div>
-    ${matches.map((m, i) => `
-      <div class="match-result">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-          <div class="match-score">${m.score}%</div>
-          <div>
-            <div class="match-name">${m.name}</div>
-            <div style="font-size:11px;color:var(--accent);font-weight:600">${m.role}</div>
-          </div>
-        </div>
-        <div class="match-reason">${m.reason}</div>
-      </div>
-    `).join('')}
-  `;
-}
-
-function closeMatchDrawer(e) {
-  if (e.target === document.getElementById('matchDrawerOverlay')) closeMatchDrawerDirect();
-}
-function closeMatchDrawerDirect() {
-  document.getElementById('matchDrawerOverlay').classList.remove('open');
-}
-
 </script>
 </body>
 </html>
